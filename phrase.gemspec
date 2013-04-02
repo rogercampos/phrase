@@ -28,4 +28,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency('webmock')
   s.add_development_dependency('vcr')
   s.add_development_dependency('timecop')
+  s.add_development_dependency('generator_spec')
+  s.add_development_dependency('rails')
 end

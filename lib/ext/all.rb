@@ -1,3 +1,5 @@
-require 'ext/object'
-require 'ext/try'
-require 'ext/hash'
+unless defined? ActiveSupport
+  require 'ext/object'
+  require 'ext/try'
+  require 'ext/hash'
+end
