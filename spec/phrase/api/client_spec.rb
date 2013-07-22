@@ -54,9 +54,22 @@ describe Phrase::Api::Client do
           }.should raise_error Phrase::Api::Exceptions::Unauthorized
         end
       end
+
+      it "recovers from server error by retrying the request" do
+        subject.should_receive(:perform_api_request).once.and_raise(Phrase::Api::Exceptions::ServerError)
+        subject.should_receive(:perform_api_request).and_call_original
+
+        VCR.use_cassette('fetch list of locales') do
+          result = subject.fetch_locales
+          result.should be_a(Array)
+          result.first[:id].should > 0
+          result.first[:name].should be_a String
+          result.first[:code].should be_a String
+        end
+      end
     end
   end
-  
+
   describe "#fetch_blacklisted_keys" do
     it "should return a list of blacklisted keys" do
       VCR.use_cassette('fetch list of blacklisted keys') do

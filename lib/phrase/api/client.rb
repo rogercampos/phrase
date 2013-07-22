@@ -21,12 +21,19 @@ class Phrase::Api::Client
   end
   
   def fetch_locales
-    result = perform_api_request("/locales", :get)
-    parsed(result).map do |locale| 
+    result = with_retry(3) { perform_api_request("/locales", :get) }
+    parsed(result).map do |locale|
       {id: locale['id'], name: locale['name'], code: locale['code'], is_default: locale['is_default']}
     end
   end
-  
+
+  def with_retry(n = 3, &block)
+    raise ArgumentError, 'no block given' unless block_given?
+    yield
+  rescue Phrase::Api::Exceptions::ServerError
+    n > 0 ? with_retry(n - 1, &block) : raise
+  end
+
   def fetch_blacklisted_keys
     result = perform_api_request("/blacklisted_keys", :get)
     blacklisted_keys = []
